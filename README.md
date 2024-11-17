@@ -1,10 +1,10 @@
-#FreeRTOS-Demonstrate	access	contention	problems when	using	shared	resources	in	a multitasking	system
+# FreeRTOS-Demonstrate	access	contention	problems when	using	shared	resources	in	a multitasking	system
+
 Proyek ini memperlihatkan bagaimana FreeRTOS digunakan untuk mengelola beberapa tugas (tasks) yang mengakses shared resource dalam sistem multitasking. Dalam implementasi ini, LED berfungsi sebagai indikator aktivitas dari masing-masing tugas dan konflik akses terhadap shared resource.
 
 Diagram Task :
 
 ![Screenshot 2024-11-17 193544](https://github.com/user-attachments/assets/10191aaf-f847-4c35-af86-312c27aadbef)
-
 
 Hardware yang diperlukan :
 1. STM32f401CCU6
@@ -28,13 +28,12 @@ Cara Kerja :
    - Jika critical section dihapus, konflik akses ke shared resource akan muncul, dan LED kuning akan menyala lebih sering.
      
 4. Siklus Perilaku LED :
-- Kasus Normal:
+   
+   a. Kasus Normal:
+   - LED hijau dan merah akan menyala bergantian, menunjukkan bahwa akses shared resource berlangsung tanpa konflik.
 
-LED hijau dan merah akan menyala bergantian, menunjukkan bahwa akses shared resource berlangsung tanpa konflik.
-
--  Kasus Konflik:
-
-Jika critical section tidak diterapkan dengan benar, LED kuning menyala, menunjukkan adanya konflik.
+   b. Kasus Konflik:
+   - Jika critical section tidak diterapkan dengan benar, LED kuning menyala, menunjukkan adanya konflik.
      
 Ringkasan Perilaku LED :
 - LED Hijau (Green): Menyala saat GreenTask mengakses shared resource.
