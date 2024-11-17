@@ -1,5 +1,5 @@
-#Demonstrate	access	contention	problems when	using	shared	resources	in	a multitasking	system
-Proyek ini menunjukkan penggunaan FreeRTOS Semaphore untuk sinkronisasi antara beberapa task dalam sistem multitasking. Program ini berfokus pada bagaimana penggunaan semaphore dapat mengatur urutan eksekusi task, khususnya dalam mengendalikan perilaku LED pada STM32F401CCU6.
+#FreeRTOS-Demonstrate	access	contention	problems when	using	shared	resources	in	a multitasking	system
+Proyek ini memperlihatkan bagaimana FreeRTOS digunakan untuk mengelola beberapa tugas (tasks) yang mengakses shared resource dalam sistem multitasking. Dalam implementasi ini, LED berfungsi sebagai indikator aktivitas dari masing-masing tugas dan konflik akses terhadap shared resource.
 
 Diagram Task :
 
@@ -16,39 +16,30 @@ Software yang diperlukan :
 
 Cara Kerja :
 1. Inisialisasi dan Penjadwalan Tugas :
-   - Program dimulai dengan inisialisasi FreeRTOS dan pembuatan dua task utama (GreenTask dan RedTask) serta satu fungsi untuk simulasi critical section.
-   - Semaphore digunakan untuk sinkronisasi antara task, memastikan hanya satu task yang mengakses shared resource.
+   - Program memulai kernel FreeRTOS untuk mengatur eksekusi beberapa threads.
+   - Tugas-tugas memiliki prioritas berbeda untuk mencerminkan kebutuhan sistem.
      
-2. Deskripsi Task :
-   a. GreenTask
-   - Task ini akan menyalakan LED Hijau
-   - Mengakses critical section menggunakan semaphore
-   - Delay selama 500ms setelah selesai mengakses
+2. Mutual Exclusion (Pengelolaan Shared Resource) :
+   - Tugas GreenTask dan RedTask bergantian mengakses variabel StartFlag.
+   - Akses ke variabel dilindungi untuk mencegah dua tugas mengakses pada waktu bersamaan.
+   - Jika akses tidak berhasil (saat shared resource sedang digunakan), LED kuning menyala sebagai indikator konflik.
      
-   b. RedTask
-   - Task ini menyalakan LED Merah
-   - Mengakses critical section menggunakan semaphore
-   - Delay selama 100ms setelah selesai mengakses
-  
-  c. Blue LED (LED Yellow)
-   - Menyala ketika ada task yang mencoba mengakses shared resource tanpa berhasil mendapatkan semaphore
+3. Indikator Konflik Akses :
+   - Jika critical section dihapus, konflik akses ke shared resource akan muncul, dan LED kuning akan menyala lebih sering.
      
-3. Mekanisme Semaphore
-   - Binary Semaphore digunakan untuk memastikan hanya satu task yang dapat mengakses critical section (dalam hal ini, kontrol LED).
-   - Jika semaphore tidak tersedia, task masuk ke mode blocked state.
-     
-5. Penanganan Konflik :
-   - Jika bagian *critical section* dihapus atau tidak diterapkan dengan benar, tugas 'GreenTask' dan 'RedTask' mungkin mencoba mengkases *shared resource* pada saat yang bersamaan, yang menyebabkan konflik.
-   - 'BlueTask' akan sering menyala untuk menunjukkan adanya konflik ketika dua tugas mencoba mengakses *shared resource* pada waktu yang bersamaan.
-     
-6. Siklus Kerja LED :
-   - **Kasus Normal** : Jika mutual exclusion bekerja dengan baik, 'GreenTask' dan 'RedTask' akan menyala bergantian, menunjukkan bahwa kedua task berhasil mengakses *shared resource*. 'OrangeTask' akan terus berkedip dengan cepat.
-   - **Kasus Problem** : Jika mutual exclusion tidak diterapkan dengan bena, 'GreenTask' dan 'RedTask' mungkin menyala bersamaan atau dengan pola yang tidak teratur, dan 'BlueTask' akan menyala untuk menunjukkan adanyan konflik.
+4. Siklus Perilaku LED :
+- Kasus Normal:
 
+LED hijau dan merah akan menyala bergantian, menunjukkan bahwa akses shared resource berlangsung tanpa konflik.
+
+-  Kasus Konflik:
+
+Jika critical section tidak diterapkan dengan benar, LED kuning menyala, menunjukkan adanya konflik.
+     
 Ringkasan Perilaku LED :
-
-
-
+- LED Hijau (Green): Menyala saat GreenTask mengakses shared resource.
+- LED Merah (Red): Menyala saat RedTask mengakses shared resource.
+- LED Kuning (Yellow): Menyala ketika terjadi konflik akses ke shared resource.
 
 Pinout Hardware :
 
@@ -60,7 +51,13 @@ Hasil Hardware :
 
 
 Hasil dari proyek ini sebagai berikut :
-1. **Normal**: LED Hijau dan Kuning bergantian menyala tanpa terdapat masalah, LED Merah tetap mati.
-2. **Problem** : Jika dengan sengaja menghapus mekanismer *critical section*, LED Biru akan sering menyala.
+1. **Normal**:
+   - LED hijau dan merah menyala bergantian tanpa konflik.
+   - LED kuning tetap mati.
+   - Menunjukkan keberhasilan pengelolaan shared resource.
+     
+2. **Problem** :
+   - LED kuning sering menyala, menunjukkan bahwa dua tugas mencoba mengakses shared resource secara bersamaan.
+   - Terjadi karena tidak diterapkannya mekanisme critical section.
    
 Project ini dikerjakan di Politeknik Elektronika Negeri Surabaya dengan dosen pengampu bapak Fernando Ardilla
